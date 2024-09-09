@@ -20,13 +20,13 @@ Welcome to Beluga Notes, a delightful, vibrant, and responsive note-taking web a
 
 Follow these instructions to get the project up and running on your local machine.
   
-<Prerequisites> 
+Prerequisites>
 Node.js
 NPM
 Google Cloud SDK
 Git
 
-<Installation>
+Installation
 Clone the repository:
 git clone https://github.com/vcatsabre/beluga-notes.git
 cd beluga-notes
@@ -37,19 +37,22 @@ npm install
 Start the server:
 npm start
 
-Visit the app: Open your browser and go to http://localhost:8080 to start taking notes!
+Visit the app: Open your browser and go to http://localhost:3000 to start taking notes!
 
-<☁️ Deploying on Google Cloud>
-Deploying Beluga Notes to GCP App Engine is easy! Here's how:
-
-<Install Google Cloud SDK and authenticate:>
+☁️ Deploying on Google Cloud
+Deploying Beluga Notes to GCP App Engine is easy! 
+  
+Here's how:
+  
+Install Google Cloud SDK and authenticate:
 gcloud auth login
  
-<Deploy to App Engine:>
+Deploy to App Engine:
 gcloud app deploy
+  
 Visit your live app: Once deployed, access the live version via the provided URL (typically https://[YOUR_PROJECT_ID].appspot.com).
 
-<💻 File Structure>
+💻 File Structure
 Here's a glance at the project structure:
 
 beluga-notes/
