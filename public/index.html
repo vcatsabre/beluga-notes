@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beluga Notes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFF9C4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #FFFDE7;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+        }
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: black;
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: #333;
+        }
+        .top-section {
+            background-color: #afaa80;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            margin-bottom: 10px;
+            display: block;
+        }
+        input, textarea, button {
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #735d28;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: antiquewhite
+        }
+        button:hover {
+            background-color: #4b331e;
+        }
+        .bottom-section {
+            background-color: #b9b060;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #333;
+        }
+        .footer .status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-family: 'Courier New', Courier, monospace;  /* Typewriter-style font */
+            font-size: 0.71rem;  /* Smaller font size */
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+    .footer .status span#vmName {
+        margin-left: 5px;  /* Space between "Serving from" and the VM name */
+        font-weight: bold; /* Make the VM name bold */
+    }
+        .footer .status .circle {
+            width: 7px;
+            height: 7px;
+            background-color: #4CAF50;  /* Green circle */
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Beluga Notes</h1>
+        <div class="top-section">
+            <h2>Add a New Note</h2>
+            <div class="input-field">
+                <label for="username">User Name:</label>
+                <input type="text" id="username" placeholder="Enter your name" />
+            </div>
+            <div class="input-field">
+                <label for="note">Note:</label>
+                <textarea id="note" rows="4" placeholder="Enter your note"></textarea>
+            </div>
+            <button id="saveNote">Save Note</button>
+        </div>
+
+        <div class="bottom-section">
+            <h2>Saved Notes</h2>
+            <table id="notesTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>User</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Notes will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        Made with ❤️ by VC
+        <div class="status">
+            Serving from <span id="vmName"> ...</span>
+            <div class="circle"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('saveNote').addEventListener('click', async function () {
+            const username = document.getElementById('username').value;
+            const note = document.getElementById('note').value;
+
+            if (!username || !note) {
+                alert('Please fill out all fields');
+                return;
+            }
+
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, note })
+            });
+
+            if (response.ok) {
+                fetchNotes();
+                document.getElementById('username').value = '';
+                document.getElementById('note').value = '';
+            } else {
+                alert('Error saving note');
+            }
+        });
+
+        async function fetchNotes() {
+            const response = await fetch('/api/notes');
+            const notes = await response.json();
+
+            const notesTableBody = document.querySelector('#notesTable tbody');
+            notesTableBody.innerHTML = '';
+
+            notes.forEach((note, index) => {
+                const row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${note.username}</td>
+                    <td>${note.note}</td>
+                </tr>`;
+                notesTableBody.innerHTML += row;
+            });
+        }
+
+        // Load notes on page load
+        fetchNotes();
+
+        // Fetch VM name and update footer
+        async function fetchVMName() {
+            const response = await fetch('/api/vm-name');
+            const data = await response.json();
+            document.getElementById('vmName').textContent = data.vmName;
+        }
+
+        fetchVMName();
+    </script>
+</body>
+</html>
